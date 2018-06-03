@@ -27,4 +27,3 @@ full_name(first, last)
 print("Type your age:")
 decades = user_input()
 calculate_decades(decades)
-
