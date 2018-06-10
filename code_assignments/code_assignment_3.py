@@ -17,7 +17,7 @@ persons =[
     }
 ]
 names = [el['name'] for el in persons]
-print(all([el for el in persons if el['age'] > 20]))
+print(all([el['age'] > 20 for el in persons]))
 copy_persons = copy.deepcopy(persons)
 copy_persons[0]['name'] = "Sergio"
 a, b, c = persons
