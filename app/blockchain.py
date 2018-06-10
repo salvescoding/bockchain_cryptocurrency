@@ -76,10 +76,11 @@ def mine_block():
         'receiver': owner,
         'amount': MINING_REWARD
     }
-    open_transactions.append(mine_reward)
+    copied_transactions = open_transactions[:]
+    copied_transactions.append(mine_reward)
     block = {'prv_block_hash': hashed_block,
              'index': len(blockchain),
-             'transactions': open_transactions
+             'transactions': copied_transactions
              }
     blockchain.append(block)
     return True
@@ -113,6 +114,10 @@ def verify_chain():
     return True
 
 
+def verify_all_transactions():
+    return all([verify_transaction(tx) for tx in open_transactions])
+
+
 waiting_for_input = True
 
 while waiting_for_input:
@@ -122,7 +127,8 @@ while waiting_for_input:
     print('3 - Print your blockchain')
     print('4 - Manipulate the chain')
     print('5 - Print the participants')
-    print('6 - Quit')
+    print('6 - Check transactions are valid')
+    print('7 - Quit')
     choice = get_user_choice()
     if choice == '1':
         transaction_data = get_transaction_value()
@@ -147,6 +153,11 @@ while waiting_for_input:
     elif choice == '5':
         print(participants)
     elif choice == '6':
+        if verify_all_transactions():
+            print('All transactions are valid')
+        else:
+            print("You have invalid transactions")
+    elif choice == '7':
         waiting_for_input = False
     else:
         print('Invalid option, please choose a number from the list')
