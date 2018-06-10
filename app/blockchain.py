@@ -27,8 +27,9 @@ def coins_received(participant):
 
 def coins_sent(participant):
     transaction_sender = [[tx['amount'] for tx in block['transactions']
-        if tx['sender'] == participant] for block in blockchain]
-    open_transactions_sender = [tx['amount'] for tx in open_transactions if tx['sender'] ==       participant]
+                           if tx['sender'] == participant] for block in blockchain]
+    open_transactions_sender = [tx['amount']
+                                for tx in open_transactions if tx['sender'] == participant]
     transaction_sender.append(open_transactions_sender)
     amount_sent = 0
     for tx in transaction_sender:
