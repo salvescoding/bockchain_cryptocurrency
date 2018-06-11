@@ -16,28 +16,22 @@ def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
 
-
-def coins_received(participant):
-    transaction_recipient = [[tx['amount'] for tx in block['transactions']
-                              if tx['receiver'] == participant] for block in blockchain]
-    amount_received = functools.reduce(lambda sum, el: sum + el[0] if len( el) > 0 else 0,                                          transaction_recipient, 0)
-    return amount_received
-
-
-def coins_sent(participant):
+def get_balance(participant):
     transaction_sender = [[tx['amount'] for tx in block['transactions']
                            if tx['sender'] == participant] for block in blockchain]
     open_transactions_sender = [tx['amount']
                                 for tx in open_transactions if tx['sender'] == participant]
     transaction_sender.append(open_transactions_sender)
+    print(transaction_sender)
     amount_sent = functools.reduce(
-        lambda sum, el: sum + el[0] if len(el) > 0 else 0,                                          transaction_sender, 0)
+        lambda memo, el: memo + sum(el) if len(el) > 0 else memo + 0,                             transaction_sender, 0)
+    transaction_recipient = [[tx['amount'] for tx in block['transactions']
+                              if tx['receiver'] == participant] for block in blockchain]
+    amount_received = functools.reduce(
+        lambda memo, el: memo + sum(el) if len(el) > 0 else memo + 0,
+        transaction_recipient, 0)
 
-    return amount_sent
-
-
-def get_balance(participant):
-    return coins_received(participant) - coins_sent(participant)
+    return amount_received - amount_sent
 
 
 def verify_transaction(transaction):
