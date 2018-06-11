@@ -1,3 +1,5 @@
+import functools
+
 MINING_REWARD = 10
 genesis_block = {
     'prv_block_hash': '',
@@ -14,14 +16,11 @@ def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
 
-def coins_received(participant):
-    transaction_sender = [[tx['amount'] for tx in block['transactions']
-                           if tx['receiver'] == participant] for block in blockchain]
-    amount_received = 0
-    for tx in transaction_sender:
-        if len(tx) > 0:
-            amount_received += tx[0]
 
+def coins_received(participant):
+    transaction_recipient = [[tx['amount'] for tx in block['transactions']
+                              if tx['receiver'] == participant] for block in blockchain]
+    amount_received = functools.reduce(lambda sum, el: sum + el[0] if len( el) > 0 else 0,                                          transaction_recipient, 0)
     return amount_received
 
 
@@ -31,10 +30,8 @@ def coins_sent(participant):
     open_transactions_sender = [tx['amount']
                                 for tx in open_transactions if tx['sender'] == participant]
     transaction_sender.append(open_transactions_sender)
-    amount_sent = 0
-    for tx in transaction_sender:
-        if len(tx) > 0:
-            amount_sent += tx[0]
+    amount_sent = functools.reduce(
+        lambda sum, el: sum + el[0] if len(el) > 0 else 0,                                          transaction_sender, 0)
 
     return amount_sent
 
@@ -165,6 +162,6 @@ while waiting_for_input:
         print_blockchain_elements()
         print("Invalid Blockchain")
         break
-    print(f" Your balance is: {get_balance(owner)} coins")
+    print("{} balance is: {:6.2f} coins".format(owner, get_balance(owner)))
 else:
     print('Thank you for using our service')
