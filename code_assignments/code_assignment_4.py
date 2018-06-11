@@ -9,4 +9,4 @@ def multiple_args(func, *args):
         print(func(arg))
         print("Result with format is {:^20.1f}".format(func(arg)))
 
-multiple_args(lambda el: el * 2, 3, 4, 5, 6, 7)
+multiple_args(lambda el: el * 2, 10, 20, 30, 40, 50)
