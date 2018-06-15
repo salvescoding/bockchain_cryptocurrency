@@ -1,6 +1,7 @@
 import functools
 import hashlib as hl
 import json
+from collections import OrderedDict
 
 MINING_REWARD = 10
 genesis_block = {
@@ -16,7 +17,7 @@ participants = {'Sergio'}
 
 
 def hash_block(block):
-    return hl.sha256(json.dumps(block).encode()).hexdigest()
+    return hl.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
 
 
 def valid_proof(transactions, last_hash, proof):
@@ -65,11 +66,14 @@ def last_blockchain_value():
 
 
 def add_transaction(receiver, sender=owner, amount=1):
-    transaction = {
-        'sender': sender,
-        'receiver': receiver,
-        'amount': amount
-    }
+    # transaction = {
+    #     'sender': sender,
+    #     'receiver': receiver,
+    #     'amount': amount
+    # }
+    transaction = OrderedDict(
+        [('sender', sender), ('receiver', receiver), ('amount', amount)])
+    print(transaction)
     if verify_transaction(transaction):
         open_transactions.append(transaction)
         participants.add(sender)
@@ -82,11 +86,13 @@ def mine_block():
     last_block = blockchain[-1]
     hashed_block = hash_block(last_block)
     proof = proof_of_work()
-    mine_reward = {
-        'sender': 'MINING',
-        'receiver': owner,
-        'amount': MINING_REWARD
-    }
+    # mine_reward = {
+    #     'sender': 'MINING',
+    #     'receiver': owner,
+    #     'amount': MINING_REWARD
+    # }
+    mine_reward = OrderedDict(
+        [('sender', 'MINING'), ('receiver', owner), ('amount', MINING_REWARD)])
     copied_transactions = open_transactions[:]
     copied_transactions.append(mine_reward)
     block = {'prv_block_hash': hashed_block,
