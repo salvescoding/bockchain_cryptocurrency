@@ -1,2 +1,0 @@
-[{"prv_block_hash": "", "index": 0, "transactions": [], "proof": 100}, {"prv_block_hash": "fb60f40b2bcf88c55dc12094c04e1020a5b501688d7618074d870907e0e9f7e9", "index": 1, "transactions": [{"sender": "MINING", "receiver": "Sergio", "amount": 10}], "proof": 71}]
-[]
