@@ -11,7 +11,6 @@ MINING_REWARD = 10
 blockchain = []
 open_transactions = []
 owner = 'Sergio'
-participants = {'Sergio'}
 
 
 def load_data():
@@ -186,9 +185,8 @@ while waiting_for_input:
     print('1 - Add a new transaction')
     print('2 - Mine the block')
     print('3 - Print your blockchain')
-    print('5 - Print the participants')
-    print('6 - Check transactions are valid')
-    print('7 - Quit')
+    print('4 - Check transactions are valid')
+    print('5 - Quit')
     choice = get_user_choice()
     if choice == '1':
         transaction_data = get_transaction_value()
@@ -204,14 +202,12 @@ while waiting_for_input:
             save_data()
     elif choice == '3':
         print_blockchain_elements()
-    elif choice == '5':
-        print(participants)
-    elif choice == '6':
+    elif choice == '4':
         if verify_all_transactions():
             print('All transactions are valid')
         else:
             print("You have invalid transactions")
-    elif choice == '7':
+    elif choice == '5':
         waiting_for_input = False
     else:
         print('Invalid option, please choose a number from the list')
