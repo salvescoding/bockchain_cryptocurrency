@@ -14,11 +14,12 @@ MINING_REWARD = 10
 
 class Blockchain:
 
-    def __init__(self):
+    def __init__(self, hosting_node):
         genesis_block = Block(0, '', [], 100, 0)
         self.chain = [genesis_block]
         self.open_transactions = []
         self.load_data()
+        self.hosting_node = hosting_node
 
     def load_data(self):
         try:
@@ -77,7 +78,8 @@ class Blockchain:
             proof += 1
         return proof
 
-    def get_balance(self, participant):
+    def get_balance(self):
+        participant = self.hosting_node
         transaction_sender = [[tx.amount for tx in block.transactions
                                if tx.sender == participant] for block in self.chain]
         open_transactions_sender = [tx.amount
@@ -114,7 +116,7 @@ class Blockchain:
             return True
         return False
 
-    def mine_block(self, node):
+    def mine_block(self):
         last_block = self.chain[-1]
         hashed_block = hash_block(last_block)
         proof = self.proof_of_work()
@@ -123,10 +125,12 @@ class Blockchain:
         #     'receiver': owner,
         #     'amount': MINING_REWARD
         # }
-        reward_transaction = Transaction('MINING', node, MINING_REWARD)
+        reward_transaction = Transaction('MINING', self.hosting_node, MINING_REWARD)
         copied_transactions = self.open_transactions[:]
         copied_transactions.append(reward_transaction)
         block = Block(len(self.chain), hashed_block,
                       copied_transactions, proof)
         self.chain.append(block)
+        self.open_transactions = []
+        self.save_data()
         return True
