@@ -1,3 +1,6 @@
+"""Provides helper methods for verification purpose on the blockchain"""
+
+
 from helpers.hash_util import hash_block, hash_string_256
 
 
