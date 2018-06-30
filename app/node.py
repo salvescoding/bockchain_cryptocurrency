@@ -13,6 +13,24 @@ CORS(app)
 def get_ui():
     return 'This worked!'
 
+@app.route('/mine', methods=['POST'])
+def mine():
+    block = blockchain.mine_block()
+    if block != None:
+        block_dict = block.__dict__.copy()
+        block_dict['transactions'] = [tx.__dict__ for tx in block_dict['transactions']]
+        response = {
+          'message': 'Block added successfully',
+          'block': block_dict
+        }
+        return jsonify(response), 201
+    else:
+        response = {
+          'message': 'Adding a new block failed',
+          'wallet_exists': wallet.public_key != None
+        }
+        return jsonify(response), 500
+
 @app.route('/chain', methods=['GET'])
 def get_chain():
     chain_snapshot = blockchain.chain
