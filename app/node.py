@@ -15,15 +15,15 @@ def create_keys():
     wallet.create_keys()
     if wallet.save_keys():
         response = {
-          'public_key': wallet.public_key,
-          'private_key': wallet.private_key
+            'public_key': wallet.public_key,
+            'private_key': wallet.private_key
         }
         global blockchain
         blockchain = Blockchain(wallet.public_key)
         return jsonify(response), 201
     else:
         response = {
-          'message': 'Saving the keys failed'
+            'message': 'Saving the keys failed'
         }
         return jsonify(response), 500
 
@@ -33,15 +33,31 @@ def load_keys():
 
     if wallet.load_keys():
         response = {
-          'public_key': wallet.public_key,
-          'message': 'You have loaded your wallet successfully'
+            'public_key': wallet.public_key,
+            'message': 'You have loaded your wallet successfully'
         }
         global blockchain
         blockchain = Blockchain(wallet.public_key)
         return jsonify(response), 200
     else:
         response = {
-          'message': 'We could not load your keys',
+            'message': 'We could not load your keys',
+            'wallet_exists?': wallet.public_key != None
+        }
+        return jsonify(response), 500
+
+
+@app.route('/balance', methods=['GET'])
+def get_balance():
+    if wallet.public_key != None:
+        balance = blockchain.get_balance()
+        response = {
+            'message': 'Your balance is: {0} scoins'.format(balance)
+        }
+        return jsonify(response), 200
+    else:
+        response = {
+          'message': 'We could not load your balance, please try again',
           'wallet_exists?': wallet.public_key != None
         }
         return jsonify(response), 500
