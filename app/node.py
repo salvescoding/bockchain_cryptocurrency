@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from wallet import Wallet
 from blockchain import Blockchain
+from helpers.converter_to_dict import ConverterToDict
 
 app = Flask(__name__)
 wallet = Wallet()
@@ -67,15 +68,22 @@ def get_balance():
 def get_ui():
     return 'This worked!'
 
+
 @app.route('/transactions', methods=['GET'])
 def open_transactions():
     transactions = blockchain.get_open_transactions()
-    dict_transactions = [tx.__dict__ for tx in transactions]
-    if open_transactions:
+    dict_transactions = ConverterToDict.transactions_to_dict(transactions)
+    if transactions:
         response = {
             'open_transactions': dict_transactions
         }
         return jsonify(response), 200
+    else:
+        response = {
+          'message': 'No open transactions'
+        }
+        return jsonify(response), 200
+
 
 @app.route('/transaction', methods=['POST'])
 def add_transaction():
@@ -84,7 +92,7 @@ def add_transaction():
     public_key = wallet.public_key
     if public_key == None:
         response = {
-          'message': 'No wallet setup'
+            'message': 'No wallet setup'
         }
         return jsonify(response), 400
     if not values:
@@ -107,10 +115,10 @@ def add_transaction():
             'funds': blockchain.get_balance(),
             'message': 'Transaction successfull',
             'transaction': {
-              'sender': public_key,
-              'receiver': receiver,
-              'amount': amount,
-              'signature': signature
+                'sender': public_key,
+                'receiver': receiver,
+                'amount': amount,
+                'signature': signature
             }
         }
         return jsonify(response), 201
@@ -120,13 +128,12 @@ def add_transaction():
         }
         return jsonify(response), 500
 
+
 @app.route('/mine', methods=['POST'])
 def mine():
     block = blockchain.mine_block()
     if block != None:
-        block_dict = block.__dict__.copy()
-        block_dict['transactions'] = [
-            tx.__dict__ for tx in block_dict['transactions']]
+        block_dict = ConverterToDict.block_to_dict(block)
         response = {
             'message': 'Block added successfully',
             'block': block_dict,
@@ -144,10 +151,7 @@ def mine():
 @app.route('/chain', methods=['GET'])
 def get_chain():
     chain_snapshot = blockchain.chain
-    chain_dict = [block.__dict__.copy() for block in chain_snapshot]
-    for block_dict in chain_dict:
-        block_dict['transactions'] = [
-            tx.__dict__ for tx in block_dict['transactions']]
+    chain_dict = ConverterToDict.chain_to_dict(chain_snapshot)
     return jsonify(chain_dict), 200
 
 
