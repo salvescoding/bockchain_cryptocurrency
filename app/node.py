@@ -20,12 +20,13 @@ def get_ui():
 def create_keys():
     wallet.create_keys()
     if wallet.save_keys():
+        global blockchain
+        blockchain = Blockchain(wallet.public_key)
         response = {
+            'funds': blockchain.get_balance(),
             'public_key': wallet.public_key,
             'private_key': wallet.private_key
         }
-        global blockchain
-        blockchain = Blockchain(wallet.public_key)
         return jsonify(response), 201
     else:
         response = {
@@ -88,7 +89,7 @@ def open_transactions():
 @app.route('/transaction', methods=['POST'])
 def add_transaction():
     values = request.get_json()
-    required_fields = ['receiver', 'amount']
+    required_fields = ['recipient', 'amount']
     public_key = wallet.public_key
     if public_key == None:
         response = {
@@ -107,7 +108,7 @@ def add_transaction():
         return jsonify(response), 400
     global blockchain
     blockchain = Blockchain(public_key)
-    receiver = values['receiver']
+    receiver = values['recipient']
     amount = values['amount']
     signature = wallet.sign_transaction(public_key, receiver, amount)
     if blockchain.add_transaction(receiver, public_key, signature, amount=amount):
@@ -116,7 +117,7 @@ def add_transaction():
             'message': 'Transaction successfull',
             'transaction': {
                 'sender': public_key,
-                'receiver': receiver,
+                'recipient': receiver,
                 'amount': amount,
                 'signature': signature
             }
