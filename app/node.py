@@ -6,8 +6,6 @@ from blockchain import Blockchain
 from helpers.converter_to_dict import ConverterToDict
 
 app = Flask(__name__)
-wallet = Wallet()
-blockchain = Blockchain(wallet.public_key)
 CORS(app)
 
 
@@ -26,7 +24,7 @@ def create_keys():
     wallet.create_keys()
     if wallet.save_keys():
         global blockchain
-        blockchain = Blockchain(wallet.public_key)
+        blockchain = Blockchain(wallet.public_key, port)
         response = {
             'funds': blockchain.get_balance(),
             'public_key': wallet.public_key,
@@ -44,7 +42,7 @@ def create_keys():
 def load_keys():
     if wallet.load_keys():
         global blockchain
-        blockchain = Blockchain(wallet.public_key)
+        blockchain = Blockchain(wallet.public_key, port)
         response = {
             'funds': blockchain.get_balance(),
             'public_key': wallet.public_key,
@@ -112,7 +110,7 @@ def add_transaction():
         }
         return jsonify(response), 400
     global blockchain
-    blockchain = Blockchain(public_key)
+    blockchain = Blockchain(public_key, port)
     receiver = values['recipient']
     amount = values['amount']
     signature = wallet.sign_transaction(public_key, receiver, amount)
@@ -207,4 +205,11 @@ def get_nodes():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--port', type=int, default=5000)
+    args = parser.parse_args()
+    port = args.port
+    wallet = Wallet(port)
+    blockchain = Blockchain(wallet.public_key, port)
+    app.run(host='0.0.0.0', port=port)
