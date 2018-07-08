@@ -130,7 +130,12 @@ def broadcast_block():
         return jsonify(response), 400
     block = values['block']
     if block['index'] == blockchain.chain[-1].index + 1:
-        pass
+        if blockchain.add_block(block):
+            response = {'message': 'Block added successfully to the peer nodes'}
+            return jsonify(response), 201
+        else:
+            response = { 'message': 'Block failed to be added to the peer nodes'}
+            return jsonify(response), 500
     elif block['index'] > blockchain.chain[-1].index:
       pass
     else:
