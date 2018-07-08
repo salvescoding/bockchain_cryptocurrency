@@ -1,3 +1,0 @@
-[{"index": 0, "previous_hash": "", "timestamp": 0, "transactions": [], "proof": 100}]
-[]
-["localhost:3212", "localhost:3001", "localhost:3200", "localhost:3202", "localhost:3003", "localhost:2000"]
