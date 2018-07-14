@@ -125,8 +125,8 @@ class Blockchain:
         return self.__chain[-1]
 
     def add_transaction(self, receiver, sender, signature, amount=1, is_receiving=False):
-        if self.public_key == None:
-            return False
+        # if self.public_key == None:
+        #     return False
         transaction = Transaction(sender, receiver, signature, amount)
         if Verification.verify_transaction(transaction, self.get_balance):
             self.__open_transactions.append(transaction)
@@ -155,6 +155,14 @@ class Blockchain:
             return False
         convert_block = Block(block['index'], block['previous_hash'], transactions, block['proof'], block['timestamp'])
         self.__chain.append(convert_block)
+        stored_transactions = self.__open_transactions[:]
+        for itx in block['transactions']:
+            for opentx in stored_transactions:
+                if itx['sender'] == opentx.sender and itx['receiver'] == opentx.receiver and itx['amount'] == opentx.amount and itx['signature'] == opentx.signature:
+                    try:
+                        self.__open_transactions.remove(opentx)
+                    except ValueError:
+                        print('Transaction has already been removed')
         self.save_data()
         return True
 
