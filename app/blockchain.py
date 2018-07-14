@@ -23,6 +23,7 @@ class Blockchain:
         self.public_key = public_key
         self.node_id = node_id
         self.__peer_nodes = set()
+        self.resolve_conflicts = False
         self.load_data()
 
     @property
@@ -193,7 +194,9 @@ class Blockchain:
                 response = requests.post(url, json={'block': converted_block})
                 if response.status_code == 400 or response.status_code == 500:
                     print("Block declined")
-                    return False
+                if response.status_code == 409:
+                    self.resolve_conflicts = True
+
             except requests.exceptions.ConnectionError:
                 continue
 
