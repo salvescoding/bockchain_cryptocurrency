@@ -199,8 +199,33 @@ class Blockchain:
 
             except requests.exceptions.ConnectionError:
                 continue
-
         return block
+
+    def resolve(self):
+        winner_chain = self.chain
+        replace = False
+        for node in self.__peer_nodes:
+            url = "http://{0}/chain".format(node)
+            try:
+                response = requests.get(url)
+                node_chain = response.json()
+                node_chain = [Block(block['index'], block['previous_hash'], [Transaction(tx['sender'], tx['receiver'], tx['signature'], tx['amount']) for tx in block['transactions']], block['proof'], block['timestamp'] ) for block in node_chain]
+                node_chain_length = len(node_chain)
+                local_node_length = len(winner_chain)
+                if node_chain_length > local_node_length and Verification.verify_chain(node_chain):
+                    winner_chain = node_chain
+                    replace = True
+            except requests.exceptions.ConnectionError:
+                continue
+        self.resolve_conflicts = False
+        self.chain = winner_chain
+        if replace:
+            self.__open_transactions = []
+        self.save_data()
+        return replace
+
+
+
 
     def add_peer_node(self, node):
         """Adds a new peer node to the node set

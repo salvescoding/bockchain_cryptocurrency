@@ -131,18 +131,22 @@ def broadcast_block():
     block = values['block']
     if block['index'] == blockchain.chain[-1].index + 1:
         if blockchain.add_block(block):
-            response = {'message': 'Block added successfully to the peer nodes'}
+            response = {
+                'message': 'Block added successfully to the peer nodes'}
             return jsonify(response), 201
         else:
-            response = { 'message': 'Block failed to be added to the peer nodes'}
+            response = {
+                'message': 'Block failed to be added to the peer nodes'}
             return jsonify(response), 409
     elif block['index'] > blockchain.chain[-1].index:
-      response = {'message': 'Blockchain seems to differ from the local blockchain'}
-      blockchain.resolve_conflicts = True
-      return jsonify(response), 200
+        response = {
+            'message': 'Blockchain seems to differ from the local blockchain'}
+        blockchain.resolve_conflicts = True
+        return jsonify(response), 200
     else:
-      response = {'message': 'Blockchain seems to be shorter'}
-      return jsonify(response), 409
+        response = {'message': 'Blockchain seems to be shorter'}
+        return jsonify(response), 409
+
 
 @app.route('/transaction', methods=['POST'])
 def add_transaction():
@@ -190,6 +194,9 @@ def add_transaction():
 
 @app.route('/mine', methods=['POST'])
 def mine():
+    if blockchain.resolve_conflicts:
+        response = {'message': 'Resolve conflicts first, block not added'}
+        return jsonify(response), 409
     block = blockchain.mine_block()
     if block != None:
         block_dict = ConverterToDict.block_to_dict(block)
@@ -205,6 +212,16 @@ def mine():
             'wallet_exists': wallet.public_key != None
         }
         return jsonify(response), 500
+
+
+@app.route('/resolve-conflicts', methods=['POST'])
+def resolve_conflicts():
+    replace = blockchain.resolve()
+    if replace:
+        response = {'message': 'Your chain was replaced'}
+    else:
+        response = {'message': 'Chain was kept!'}
+    return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
