@@ -70,7 +70,7 @@ class Blockchain:
     def save_data(self):
         try:
             with open('blockchain-{0}.txt'.format(self.node_id), mode='w') as f:
-                # Save data as JSON format
+                # Save data as JSON format
                 savable_blockchain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [
                     tx.__dict__ for tx in block_el.transactions], block_el.proof, block_el.timestamp) for block_el in self.__chain]]
                 f.write(json.dumps(savable_blockchain))
@@ -98,8 +98,8 @@ class Blockchain:
         return proof
 
     def get_balance(self, sender=None):
-        if sender == None:
-            if self.public_key == None:
+        if sender is None:
+            if self.public_key is None:
                 return None
             participant = self.public_key
         else:
@@ -111,7 +111,7 @@ class Blockchain:
         transaction_sender.append(open_transactions_sender)
         print(transaction_sender)
         amount_sent = functools.reduce(
-            lambda memo, el: memo + sum(el) if len(el) > 0 else memo + 0,                             transaction_sender, 0)
+            lambda memo, el: memo + sum(el) if len(el) > 0 else memo + 0,                               transaction_sender, 0)
         transaction_recipient = [[tx.amount for tx in block.transactions
                                   if tx.receiver == participant] for block in self.__chain]
         amount_received = functools.reduce(
@@ -154,7 +154,8 @@ class Blockchain:
         hashes_match = hash_block(self.chain[-1]) == block['previous_hash']
         if not proof_is_valid or not hashes_match:
             return False
-        convert_block = Block(block['index'], block['previous_hash'], transactions, block['proof'], block['timestamp'])
+        convert_block = Block(block['index'], block['previous_hash'],
+                              transactions, block['proof'], block['timestamp'])
         self.__chain.append(convert_block)
         stored_transactions = self.__open_transactions[:]
         for itx in block['transactions']:
@@ -168,7 +169,7 @@ class Blockchain:
         return True
 
     def mine_block(self):
-        if self.public_key == None:
+        if self.public_key is None:
             return None
         last_block = self.__chain[-1]
         hashed_block = hash_block(last_block)
@@ -209,7 +210,8 @@ class Blockchain:
             try:
                 response = requests.get(url)
                 node_chain = response.json()
-                node_chain = [Block(block['index'], block['previous_hash'], [Transaction(tx['sender'], tx['receiver'], tx['signature'], tx['amount']) for tx in block['transactions']], block['proof'], block['timestamp'] ) for block in node_chain]
+                node_chain = [Block(block['index'], block['previous_hash'], [Transaction(tx['sender'], tx['receiver'], tx['signature'], tx['amount'])
+                for tx in block['transactions']], block['proof'], block['timestamp']) for block in node_chain]
                 node_chain_length = len(node_chain)
                 local_node_length = len(winner_chain)
                 if node_chain_length > local_node_length and Verification.verify_chain(node_chain):
@@ -223,9 +225,6 @@ class Blockchain:
             self.__open_transactions = []
         self.save_data()
         return replace
-
-
-
 
     def add_peer_node(self, node):
         """Adds a new peer node to the node set

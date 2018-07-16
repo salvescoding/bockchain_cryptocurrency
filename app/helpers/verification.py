@@ -21,7 +21,8 @@ class Verification:
                 continue
             if block.previous_hash != hash_block(blockchain[index - 1]):
                 return False
-            if not cls.valid_proof(block.transactions[:-1], block.previous_hash, block.proof):
+            if not cls.valid_proof(block.transactions[:-1],
+                                   block.previous_hash, block.proof):
                 print('Proof of work is invalid')
                 return False
         return True
@@ -30,10 +31,12 @@ class Verification:
     def verify_transaction(transaction, get_balance, check_funds=True):
         if check_funds:
             sender_balance = get_balance(transaction.sender)
-            return sender_balance >= transaction.amount and Wallet.verify_transaction(transaction)
+            return (sender_balance >= transaction.amount and
+                    Wallet.verify_transaction(transaction))
         else:
             return Wallet.verify_transaction(transaction)
 
     @classmethod
     def verify_all_transactions(cls, open_transactions, get_balance):
-        return all([cls.verify_transaction(tx, get_balance, False) for tx in open_transactions])
+        return all([cls.verify_transaction(tx, get_balance, False)
+                    for tx in open_transactions])

@@ -52,7 +52,7 @@ def load_keys():
     else:
         response = {
             'message': 'We could not load your keys',
-            'wallet_exists?': wallet.public_key != None
+            'wallet_exists?': wallet.public_key is not None
         }
         return jsonify(response), 500
 
@@ -68,7 +68,7 @@ def get_balance():
     else:
         response = {
             'message': 'We could not load your balance, please try again',
-            'wallet_exists?': wallet.public_key != None
+            'wallet_exists?': wallet.public_key is not None
         }
         return jsonify(response), 500
 
@@ -209,7 +209,7 @@ def mine():
     else:
         response = {
             'message': 'Adding a new block failed',
-            'wallet_exists': wallet.public_key != None
+            'wallet_exists': wallet.public_key is not None
         }
         return jsonify(response), 500
 
@@ -239,7 +239,7 @@ def add_node():
             'message': 'No data attached'
         }
         return jsonify(response), 400
-    if not 'node' in values:
+    if 'node' not in values:
         response = {
             'message': 'No data attached'
         }
