@@ -9,6 +9,7 @@ from helpers.verification import Verification
 from block import Block
 from transaction import Transaction
 from wallet import Wallet
+from helpers.converter_to_obj import ConverterToObj
 
 
 MINING_REWARD = 10
@@ -40,26 +41,12 @@ class Blockchain:
     def load_data(self):
         try:
             with open('blockchain-{0}.txt'.format(self.node_id), mode='r') as f:
-                # file_content = pickle.loads(f.read())
                 file_content = f.readlines()
-                # blockchain = file_content['chain']
-                # open_transactions = file_content['open_transactions']
                 blockchain = json.loads(file_content[0][:-1])
-                updated_blockchain = []
-                for block in blockchain:
-                    converted_tx = [Transaction(
-                        tx['sender'], tx['receiver'], tx['signature'], tx['amount']) for tx in block['transactions']]
-                    updated_block = Block(
-                        block['index'], block['previous_hash'], converted_tx, block['proof'], block['timestamp'])
-                    updated_blockchain.append(updated_block)
-                self.chain = updated_blockchain
+                self.chain = ConverterToObj.chain_to_obj(blockchain)
                 open_transactions = json.loads(file_content[1][:-1])
-                updated_transactions = []
-                for tx in open_transactions:
-                    updated_transaction = Transaction(
-                        tx['sender'], tx['receiver'], tx['signature'], tx['amount'])
-                    updated_transactions.append(updated_transaction)
-                self.__open_transactions = updated_transactions
+                self.__open_transactions = ConverterToObj.transaction_dict_to_obj(
+                    open_transactions)
                 peer_nodes = json.loads(file_content[2])
                 self.__peer_nodes = set(peer_nodes)
         except (IOError, IndexError):
